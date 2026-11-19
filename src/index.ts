@@ -7,6 +7,22 @@ function allowedSenders(value: string): Set<string> {
 	);
 }
 
+function isSenderAllowed(from: string, senders: Set<string>): boolean {
+	const normalized = from.trim().toLowerCase();
+	if (senders.has("*") || senders.has("all")) {
+		return true;
+	}
+	if (senders.has(normalized)) {
+		return true;
+	}
+	const parts = normalized.split("@");
+	const domain = parts[1];
+	if (domain && (senders.has(domain) || senders.has(`@${domain}`))) {
+		return true;
+	}
+	return false;
+}
+
 function needsConfiguration(values: string[]): boolean {
 	return values.some(
 		(value) => !value.trim() || /\b[a-z0-9.-]+\.example\b/i.test(value),
@@ -67,7 +83,7 @@ export async function handleEmail(
 	}
 
 	// Email Routing exposes the SMTP envelope sender as `message.from`.
-	if (!senders.has(message.from.trim().toLowerCase())) {
+	if (!isSenderAllowed(message.from, senders)) {
 		message.setReject("Sender is not allowed");
 		return;
 	}
