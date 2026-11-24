@@ -9,9 +9,7 @@ function allowedSenders(value: string): Set<string> {
 
 function isSenderAllowed(from: string, senders: Set<string>): boolean {
 	const normalized = from.trim().toLowerCase();
-	if (senders.has("*") || senders.has("all")) {
-		return true;
-	}
+	// Authorization is explicit: wildcard tokens are not supported.
 	if (senders.has(normalized)) {
 		return true;
 	}
@@ -59,7 +57,7 @@ async function renderSetupPage(request: Request, env: Env): Promise<Response> {
 					sendersConfigured ? "Configured" : "Not configured",
 				);
 			},
-		})
+			})
 		.on("#configuration-warning", {
 			element(element) {
 				if (!showWarning) {
@@ -92,8 +90,6 @@ export async function handleEmail(
 }
 
 export default {
-	// Matching static files are normally served before the Worker runs. This
-	// fallback also exposes the setup page through service bindings and tests.
 	async fetch(request, env) {
 		if (new URL(request.url).pathname === "/") {
 			return renderSetupPage(request, env);
