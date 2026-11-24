@@ -23,7 +23,7 @@ function isSenderAllowed(from: string, senders: Set<string>): boolean {
 
 function needsConfiguration(values: string[]): boolean {
 	return values.some(
-		(value) => !value.trim() || /\\b[a-z0-9.-]+\\.example\\b/i.test(value),
+		(value) => !value.trim() || /\b[a-z0-9.-]+\.example\b/i.test(value),
 	);
 }
 
