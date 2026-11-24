@@ -2,15 +2,13 @@
 
 # Email Routing Worker
 
-Forward incoming email from approved senders to a verified destination address with Cloudflare Email Routing.
+Forward incoming email from explicitly approved senders to a verified destination address with Cloudflare Email Routing.
 
 <!-- dash-content-start -->
 
 This starter uses an Email Worker to forward messages from a configurable sender allowlist to one verified destination. Its top-level Wrangler `addresses` configuration creates and maintains the Email Routing rules that invoke the Worker.
 
-The Worker rejects messages from unapproved senders and fails closed when its destination or allowlist is missing.
-
-It uses [Email Routing](https://developers.cloudflare.com/email-service/email-routing/) for inbound delivery, a [Workers email handler](https://developers.cloudflare.com/email-service/api/route-emails/email-handler/) for forwarding decisions, and [Workers Assets](https://developers.cloudflare.com/workers/static-assets/) for the setup page.
+The Worker rejects messages from unapproved senders and fails closed when its destination or allowlist is missing. Sender authorization supports explicit email addresses and explicitly listed domains; wildcard tokens such as `*` and `all` are not supported.
 
 <!-- dash-content-end -->
 
@@ -22,20 +20,13 @@ It uses [Email Routing](https://developers.cloudflare.com/email-service/email-ro
 2. The Worker compares the SMTP envelope sender with `ALLOWED_SENDERS`.
 3. Approved messages are forwarded to `FORWARD_TO`; all other messages are rejected.
 
-The template uses TypeScript without an application framework. Its `ASSETS` binding serves the static setup page, while the email event handler processes incoming messages.
-
-## Prerequisites
-
-- A domain on Cloudflare with Email Routing enabled.
-- A verified Email Routing destination address.
-
 ## Configure the Worker
 
 Set these variables in `wrangler.jsonc` or during deployment:
 
 - `ROUTE_ADDRESS`: The Email Routing address shown on the setup page. Keep it in sync with the top-level `addresses` configuration.
 - `FORWARD_TO`: The verified destination that receives forwarded messages.
-- `ALLOWED_SENDERS`: A comma-separated list of sender addresses allowed to use the route.
+- `ALLOWED_SENDERS`: A comma-separated list of explicit sender email addresses or sender domains. Do not use `*` or `all`.
 
 Then uncomment the top-level `addresses` section in `wrangler.jsonc` and replace its example address:
 
@@ -43,7 +34,7 @@ Then uncomment the top-level `addresses` section in `wrangler.jsonc` and replace
 "addresses": ["support@company.example"]
 ```
 
-Use `"*@company.example"` instead to route every otherwise-unmatched address on a domain to this Worker.
+Use `"*@company.example"` in the Cloudflare Email Routing `addresses` configuration only when you intentionally want to route every otherwise-unmatched recipient address on that domain to this Worker. This is separate from sender authorization: the Worker still requires an explicit `ALLOWED_SENDERS` match.
 
 The setup page displays `ROUTE_ADDRESS` and `FORWARD_TO`, and indicates whether an allowlist exists without exposing its contents. It also warns while any email setting still contains example data.
 
