@@ -12,7 +12,7 @@
 	"vars": {
 		"ROUTE_ADDRESS": "support@learn-map.in",
 		"FORWARD_TO": "learnmapai75@gmail.com",
-		"ALLOWED_SENDERS": "admin.learn-map.in, learnmapai75@gmail.com, ranjeet.tiwary@learn-map.in, *"
+		"ALLOWED_SENDERS": "admin.learn-map.in, learnmapai75@gmail.com, ranjeet.tiwary@learn-map.in"
 	},
 	// Email Routing rules for support@learn-map.in and admin@learn-map.in are managed and bound to this worker in Cloudflare.
 	"observability": {
